@@ -51,6 +51,10 @@ export function parseAuthOrigins(raw: string | undefined): string[] {
 // at the Choreo/Cloudflare edge: X-Frame-Options / frame-ancestors (ignored
 // in meta), HSTS, X-Content-Type-Options, Permissions-Policy, Clear-Site-Data.
 //
+// img-src allows any https: host, so an image URL set in window.config (such as
+// the email signature image) renders in the in-app preview without a rebuild.
+// This supersedes the per-host image notes below.
+//
 // Origins: backend calls and employee thumbnails go through the Choreo
 // gateway (apis[-stg].wso2.com) and Asgardeo (*.asgardeo.io). Those hosts are
 // runtime-configurable (window.config) so a static build can't pin exact
@@ -108,7 +112,7 @@ export function buildCsp(extraAuthOrigins: readonly string[] = []): string {
     // every page.
     "script-src 'self' 'wasm-unsafe-eval' https://accounts.google.com https://apis.google.com",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://*.wso2.com https://wso2.cachefly.net https://*.asgardeo.io https://*.googleusercontent.com https://*.blob.core.windows.net https://media.licdn.com",
+    "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://wso2.cachefly.net",
     `connect-src 'self' https://*.wso2.com https://*.choreoapis.dev https://*.asgardeo.io https://*.googleapis.com https://accounts.google.com${extra}`,
     "media-src 'self' https://*.choreoapis.dev https://*.wso2.com",

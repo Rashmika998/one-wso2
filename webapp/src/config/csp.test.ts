@@ -40,12 +40,13 @@ describe("buildCsp: default allowlist", () => {
     expect(directive(csp, "frame-src")).toContain("https://*.wso2.com");
   });
 
-  // Amplify post cards show the campaign image from LinkedIn's media CDN.
-  it("loads LinkedIn post images from media.licdn.com only", () => {
+  // Images may come from any https host, so a URL set in window.config renders
+  // without a rebuild. Other directives stay restricted.
+  it("loads images from any https host, but not from plain http", () => {
     const csp = buildCsp();
-    const linkedInImageSources = directive(csp, "img-src").split(" ").filter((source) => source.includes("licdn"));
-    expect(linkedInImageSources).toEqual(["https://media.licdn.com"]);
-    expect(directive(csp, "connect-src")).not.toContain("licdn.com");
+    expect(directive(csp, "img-src").split(" ")).toContain("https:");
+    expect(directive(csp, "img-src")).not.toContain("http:/");
+    expect(directive(csp, "connect-src")).not.toContain("https: ");
   });
 });
 
